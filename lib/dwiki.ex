@@ -14,7 +14,7 @@ defmodule Dwiki do
     children = [
       # Starts a worker by calling: Dwiki.Worker.start_link(arg1, arg2, arg3)
       # worker(Dwiki.Worker, [arg1, arg2, arg3]),
-      Plug.Adapters.Cowboy.child_spec(:http, Dwiki.DRouter, [ dparams ],
+      Plug.Adapters.Cowboy.child_spec(:http, Dwiki.Router, [ dparams ],
         port: port)
     ]
 
