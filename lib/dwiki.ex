@@ -8,13 +8,18 @@ defmodule Dwiki do
 
     port = Application.get_env(:dwiki, :cowboy_port, 4000)
 
-    dparams = %{ test: "test" }
+    pages_dir = Path.join(File.cwd!(), "pages")
+    unless File.exists?(pages_dir) do
+      File.mkdir!(pages_dir)
+    end
+
+    dparams = [ test: "test", pages_dir: pages_dir ]
 
     # Define workers and child supervisors to be supervised
     children = [
       # Starts a worker by calling: Dwiki.Worker.start_link(arg1, arg2, arg3)
       # worker(Dwiki.Worker, [arg1, arg2, arg3]),
-      Plug.Adapters.Cowboy.child_spec(:http, Dwiki.Router, [ dparams ],
+      Plug.Adapters.Cowboy.child_spec(:http, Dwiki.Router, dparams,
         port: port)
     ]
 
