@@ -2,11 +2,8 @@
 <html>
   <body>
     <form action="/save/<%= page %>" method="post">
-      <textarea name="page" rows="20" cols="40">
-
-    <%= page_contents %>
-
-      </textarea>
+      <textarea name="page-text" rows="20" cols="40">
+<%= page_contents %></textarea>
 
       <input type="submit" value="Save Page">
     </form>

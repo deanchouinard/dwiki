@@ -2,6 +2,7 @@ defmodule Dwiki.Router do
   use Plug.Router
 
   #  plug :opts_to_private
+  plug Plug.Parsers, parsers: [:urlencoded]
   plug :match
   plug :dispatch
 
@@ -10,7 +11,7 @@ defmodule Dwiki.Router do
     |> IO.inspect
 
     page_contents =
-      process_page(conn.assigns.my_app_opts[:pages_dir], "index.md")
+      show_page(conn.assigns.my_app_opts[:pages_dir], "index.md")
 
     conn
     |> put_resp_content_type("text/html")
@@ -20,7 +21,7 @@ defmodule Dwiki.Router do
 
   get "/*path" do
     page_contents =
-      process_page(conn.assigns.my_app_opts[:pages_dir], path)
+      show_page(conn.assigns.my_app_opts[:pages_dir], path)
 
     conn
     |> put_resp_content_type("text/html")
@@ -29,9 +30,15 @@ defmodule Dwiki.Router do
 
   post "save/*path" do
 
+    IO.inspect conn.params
+    page_text = conn.params["page-text"]
+    IO.inspect page_text
+    File.write!(Path.join("pages", path), page_text)
+    page_contents = show_page("pages", path)
+
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, "save page: #{path}")
+    |> send_resp(200, page_contents)
   end
 
   post "/*path" do
@@ -53,7 +60,7 @@ defmodule Dwiki.Router do
       page_contents, page: page])
   end
 
-  defp process_page(pages_dir, page) do
+  defp show_page(pages_dir, page) do
     page_path = Path.join(pages_dir, page)
     unless File.exists?(page_path) do
       File.write!(page_path, "### #{page} \n")
