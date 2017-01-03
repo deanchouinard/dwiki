@@ -8,7 +8,13 @@ defmodule Dwiki do
 
     port = Application.get_env(:dwiki, :cowboy_port, 4000)
 
-    pages_dir = Path.join(File.cwd!(), "pages")
+    pages_dir = case Mix.env do
+      :test ->
+        Path.join(File.cwd!(), "test/pages")
+      _ ->
+        Path.join(File.cwd!(), "pages")
+    end
+    
     unless File.exists?(pages_dir) do
       File.mkdir!(pages_dir)
     end

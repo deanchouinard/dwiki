@@ -4,19 +4,18 @@ defmodule DwikiTest do
 
   doctest Dwiki
 
-  @opts Dwiki.Router.init([])
+  @opts Dwiki.Router.init([pages_dir: "/Users/dean/wrk/elixir/dwiki/test/pages"])
 
   test "plug root" do
     conn = conn(:get, "/", "")
       |> Dwiki.Router.call(@opts)
 
-    IO.inspect conn
-
     assert conn.state == :sent
     assert conn.status == 200
-    assert conn.resp_body == "hello"
+    assert conn.resp_body =~ "hello"
   end
 
+  @tag :skip
   test "plug returns 404" do
     conn = conn(:get, "/missing", "")
       |> Dwiki.Router.call(@opts)
