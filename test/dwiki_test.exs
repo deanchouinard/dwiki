@@ -12,7 +12,7 @@ defmodule DwikiTest do
 
     assert conn.state == :sent
     assert conn.status == 200
-    assert conn.resp_body =~ "hello"
+    assert conn.resp_body =~ "index.md"
   end
 
   @tag :skip

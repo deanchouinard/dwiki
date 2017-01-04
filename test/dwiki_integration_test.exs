@@ -4,12 +4,18 @@ defmodule DwikiIntegrationTest do
 
   doctest Dwiki
 
+  setup_all do
+    :os.cmd('rm test/pages/*')
+
+    :ok
+  end
+
   test "shows index.md page" do
     response = HTTPoison.get! "http://localhost:4000/"
 
     assert %HTTPoison.Response{status_code: 200} = response
     assert %HTTPoison.Response{body: body} = response
-    assert body =~ "hello"
+    assert body =~ "index.md"
 
   end
 
@@ -20,16 +26,19 @@ defmodule DwikiIntegrationTest do
     assert %HTTPoison.Response{body: body} = response
 
     response = HTTPoison.post! "http://localhost:4000/first.md",
-    "{\"body\": \"body\"}", [{"Content-Type", "application/x-www-form-urlencoded"}]
+    "", [{"Content-Type", "application/x-www-form-urlencoded"}]
+    #"{\"body\": \"body\"}", [{"Content-Type", "application/x-www-form-urlencoded"}]
     #"{\"body\": \"body\"}"
     assert %HTTPoison.Response{status_code: 200} = response
     %HTTPoison.Response{body: body} = response
     #    body = body <> "edit"
 
-    IO.inspect response
+    [{_, _, [text]}] = Floki.find(body, "textarea")
+    IO.puts text
+    text = text <> " edit"
 
     response = HTTPoison.post! "http://localhost:4000/save/first.md",
-    {:form, [pagetext: "edit"]}, [{"Content-Type", "application/x-www-form-urlencoded"}]
+    {:form, [pagetext: text]}, [{"Content-Type", "application/x-www-form-urlencoded"}]
     assert %HTTPoison.Response{status_code: 200} = response
     assert %HTTPoison.Response{body: body} = response
     assert body =~ "edit"

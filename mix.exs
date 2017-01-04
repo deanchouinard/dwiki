@@ -31,7 +31,8 @@ defmodule Dwiki.Mixfile do
     [{:cowboy, "~> 1.0.0"},
       {:plug, "~> 1.0"},
       {:earmark, "~> 1.0"},
-      {:httpoison, "~> 0.10.0"}
+      {:httpoison, "~> 0.10.0"},
+      {:floki, "~> 0.12.0", only: :test}
     ]
   end
 end
