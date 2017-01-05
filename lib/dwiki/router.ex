@@ -23,6 +23,15 @@ defmodule Dwiki.Router do
     |> send_resp(200, page_contents)
   end
 
+  post "/search" do
+    page_text = conn.params["stext"]
+    page_contents = search_results(conn.assigns.my_app_opts[:pages_dir], page_text)
+
+    conn
+    |> put_resp_content_type("text/html")
+    |> send_resp(200, page_contents)
+  end
+
   post "save/*path" do
 
     page_path = conn.assigns.my_app_opts[:pages_dir]
@@ -46,11 +55,15 @@ defmodule Dwiki.Router do
 
   match _, do: send_resp(conn, 404, "not found")
 
+  defp search_results(pages_dir, stext) do
+    IO.puts "search_results"
+    System.cmd("ack", [stext], cd: pages_dir)
+  end
+
   defp edit_page(pages_dir, page) do
     page_path = Path.join(pages_dir, page)
     page_contents = File.read!(page_path)
-    EEx.eval_file("templates/edit_page.eex", [page_contents:
-      page_contents, page: page])
+    build_page("templates/edit_page.eex", {page_contents, page})
   end
 
   defp show_page(pages_dir, page) do
@@ -61,8 +74,14 @@ defmodule Dwiki.Router do
 
     page_contents = File.read!(page_path)
     page_contents = Earmark.to_html(page_contents)
-    EEx.eval_file("templates/show_page.eex", [page_contents:
-      page_contents, page: page])
+    build_page("templates/show_page.eex", {page_contents, page})
+
+  end
+
+  defp build_page(template, {page_contents, page} = _vars) do
+    EEx.eval_file("templates/app.eex", [body:
+      EEx.eval_file(template, [page_contents: page_contents, page: page])
+    ])
   end
 
   def call(conn, opts) do

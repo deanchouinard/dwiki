@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <body>
     <%= page_contents %>
 
     <form action="/<%= page %>" method="post">
       <input type="submit" value="Edit Page">
     </form>
-
-  </body>
-</html>
-
