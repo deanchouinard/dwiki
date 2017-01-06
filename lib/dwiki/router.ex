@@ -57,8 +57,21 @@ defmodule Dwiki.Router do
 
   defp search_results(pages_dir, stext) do
     IO.puts "search_results"
-    System.cmd("ack", [stext], cd: pages_dir)
+    ##System.cmd("ack", [stext], cd: pages_dir)
+    Enum.map(File.ls!(pages_dir), fn(x) -> search_file(pages_dir, x,
+    stext) end)
+    |> IO.inspect
   end
+
+  defp search_file(pages_dir, file, stext) do
+    File.stream!(Path.join(pages_dir, file))
+    |> Enum.filter(&(String.contains?(&1, stext)))
+    |> Enum.map(&(make_link(&1, file)))
+  end
+
+  defp make_link(match, file) do
+    "<a href=#{file}>#{match}</a> #{file}</br>"
+    end
 
   defp edit_page(pages_dir, page) do
     page_path = Path.join(pages_dir, page)
