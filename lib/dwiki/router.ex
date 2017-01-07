@@ -58,9 +58,9 @@ defmodule Dwiki.Router do
   defp search_results(pages_dir, stext) do
     IO.puts "search_results"
     ##System.cmd("ack", [stext], cd: pages_dir)
-    Enum.map(File.ls!(pages_dir), fn(x) -> search_file(pages_dir, x,
-    stext) end)
-    |> IO.inspect
+    results = Enum.map(File.ls!(pages_dir), fn(x) -> search_file(pages_dir, x,
+      stext) end)
+    build_page("templates/search_results_page.eex", {results, "Search"})
   end
 
   defp search_file(pages_dir, file, stext) do

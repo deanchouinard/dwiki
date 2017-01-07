@@ -44,5 +44,20 @@ defmodule DwikiIntegrationTest do
     assert body =~ "edit"
   end
 
+  test "search" do
+    response = HTTPoison.get! "http://localhost:4000/first.md"
+
+    assert %HTTPoison.Response{status_code: 200} = response
+    assert %HTTPoison.Response{body: body} = response
+    assert body =~ "search"
+
+    text = "first"
+    response = HTTPoison.post! "http://localhost:4000/search",
+      {:form, [stext: text]}, [{"Content-Type", "application/x-www-form-urlencoded"}]
+    assert %HTTPoison.Response{status_code: 200} = response
+    assert %HTTPoison.Response{body: body} = response
+    assert body =~ "<a href=first.md>### first.md"
+  end
+
 end
 
