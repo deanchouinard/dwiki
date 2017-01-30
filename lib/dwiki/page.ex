@@ -8,7 +8,9 @@ defmodule Dwiki.Page do
   end
 
   def show_page(pages_dir, page) do
+    IO.inspect page
     page_path = Path.join(pages_dir, page)
+    IO.inspect page_path
     unless File.exists?(page_path) do
       File.write!(page_path, "### #{page} \n")
     end
@@ -18,6 +20,8 @@ defmodule Dwiki.Page do
     build_page("templates/show_page.eex", {page_contents, page})
 
   end
+
+  def bootstrap, do: File.read!("static/css/bootstrap.min.css")
 
   defp build_page(template, {page_contents, page} = _vars) do
     EEx.eval_file("templates/app.eex", [body:

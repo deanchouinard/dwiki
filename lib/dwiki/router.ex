@@ -15,13 +15,26 @@ defmodule Dwiki.Router do
     |> send_resp(200, page_contents)
   end
 
+  get "favicon.ico" do
+    conn
+  end
+
+  get "/static/css/bootstrap.min.css" do
+    page_contents = Page.bootstrap()
+    conn
+    |> put_resp_content_type("text/css")
+    |> send_resp(200, page_contents)
+  end
+
   get "/*path" do
-    page_contents =
-      Page.show_page(conn.assigns.my_app_opts[:pages_dir], path)
+    {code, page_contents} = case String.match?(List.last(path), ~r/\.md$/) do
+      true -> {200, Page.show_page(conn.assigns.my_app_opts[:pages_dir], path)}
+      _ -> {404, "not found"}
+    end
 
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, page_contents)
+    |> send_resp(code, page_contents)
   end
 
   post "/search" do
